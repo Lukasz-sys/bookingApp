@@ -8,13 +8,6 @@ Stack:
 
 ## Uruchomienie Windows PowerShell
 
-```powershell
-cd C:\Users\lukpu\Desktop\bookingApp
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-.\start_windows.ps1
-```
-
-Alternatywnie:
 
 ```powershell
 docker rm -f booking_postgres booking_api booking_frontend 2>$null
@@ -45,15 +38,6 @@ Po aktualizacji paczki zrób twarde odświeżenie:
 Ctrl + F5
 ```
 
-W tej wersji CSS jest dostępny pod dwoma adresami, żeby uniknąć problemu braku styli:
-
-```text
-http://localhost:8080/styles.css
-http://localhost:8080/static/styles.css
-```
-
-Jeżeli strona działa, ale bez styli, otwórz pierwszy adres CSS. Powinien pokazać zawartość pliku `styles.css`.
-
 ## Konta demo
 
 Hasło do wszystkich kont:
@@ -82,7 +66,3 @@ tomasz.wisniewski@example.com  ortopeda
 - przypomnienia e-mail,
 - frontend i backend w Dockerze.
 
-
-## Poprawka Windows / Docker
-
-Skrypt `start_windows.ps1` usuwa stare kontenery tylko wtedy, gdy istnieją. Dzięki temu komunikat Dockera `No such container` nie przerywa uruchamiania projektu.
