@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Weryfikacja e-mail</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/styles.css?v=8">
+</head>
+<body>
+<main class="verify-page">
+  <section class="card">
+    <h1>Weryfikacja e-mail</h1>
+    <p id="verifyMessage" class="message">Sprawdzam link...</p>
+    <a class="button-link" href="/index.html">Wróć do logowania</a>
+  </section>
+</main>
+<script src="/config.js?v=8"></script>
+<script>
+const DEFAULT_API_URL = 'http://localhost:8000';
+const API_URL = String(window.BOOKING_API_URL || (window.location.port === '8000' ? window.location.origin : DEFAULT_API_URL)).replace(/\/$/, '');
+const message = document.querySelector('#verifyMessage');
+const token = new URLSearchParams(location.search).get('token');
+
+(async () => {
+  if (!token) {
+    message.className = 'message error';
+    message.textContent = 'Brakuje tokenu.';
+    return;
+  }
+  try {
+    const response = await fetch(`${API_URL}/api/auth/verify-email?token=${encodeURIComponent(token)}`);
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.detail || 'Nie udało się zweryfikować e-maila.');
+    message.className = 'message ok';
+    message.textContent = data.message || 'Adres e-mail został zweryfikowany.';
+  } catch (error) {
+    message.className = 'message error';
+    message.textContent = error.message;
+  }
+})();
+</script>
+</body>
+</html>

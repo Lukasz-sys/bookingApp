@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>System rezerwacji wizyt</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/styles.css?v=8">
+</head>
+<body>
+<header class="hero">
+  <div>
+    <p class="eyebrow">System rezerwacji</p>
+    <h1>Rezerwacje online dla lekarzy i placówek</h1>
+    <p>FastAPI + PostgreSQL + HTML/CSS/JS. Logowanie, rejestracja, terminarz, wizyty i e-maile.</p>
+  </div>
+  <div id="userBadge" class="user-badge guest" aria-live="polite">
+    <span class="status-dot"></span>
+    <span>
+      <strong>Gość</strong>
+      <small>Nie zalogowano</small>
+    </span>
+  </div>
+</header>
+
+<main class="layout">
+  <section class="card wide">
+    <div class="section-header">
+      <h2>Konto</h2>
+      <button id="logoutBtn" class="secondary hidden" type="button">Wyloguj</button>
+    </div>
+
+    <div class="tabs">
+      <button id="showLogin" class="tab active" type="button">Logowanie</button>
+      <button id="showRegister" class="tab" type="button">Rejestracja</button>
+    </div>
+
+    <form id="loginForm" class="form two-cols-login">
+      <label>E-mail
+        <input id="loginEmail" type="email" required autocomplete="email">
+      </label>
+      <label>Hasło
+        <input id="loginPassword" type="password" required autocomplete="current-password">
+      </label>
+      <button type="submit">Zaloguj</button>
+    </form>
+
+    <form id="registerForm" class="form hidden">
+      <div class="grid-3">
+        <label>Typ konta
+          <select id="registerRole">
+            <option value="patient">Pacjent</option>
+            <option value="doctor">Lekarz</option>
+            <option value="company_admin">Firma / placówka</option>
+          </select>
+        </label>
+        <label>Imię i nazwisko / kontakt
+          <input id="registerName" required minlength="2" autocomplete="name">
+        </label>
+        <label>Telefon
+          <input id="registerPhone" autocomplete="tel">
+        </label>
+      </div>
+
+      <div class="grid-2">
+        <label>E-mail
+          <input id="registerEmail" type="email" required autocomplete="email">
+        </label>
+        <label>Hasło min. 8 znaków
+          <input id="registerPassword" type="password" minlength="8" required autocomplete="new-password">
+        </label>
+      </div>
+
+      <div id="companyFields" class="conditional hidden">
+        <h3>Dane firmy / placówki</h3>
+        <div class="grid-3">
+          <label>Nazwa, np. Luxmed
+            <input id="companyName">
+          </label>
+          <label>NIP
+            <input id="companyNip">
+          </label>
+          <label>Adres
+            <input id="companyAddress">
+          </label>
+        </div>
+      </div>
+
+      <div id="doctorFields" class="conditional hidden">
+        <h3>Dane lekarza</h3>
+        <div class="grid-3">
+          <label>Specjalizacja
+            <input id="specialization" placeholder="np. Kardiolog">
+          </label>
+          <label>PWZ/licencja
+            <input id="licenseNumber">
+          </label>
+          <label>ID firmy, opcjonalnie
+            <input id="doctorCompanyId" type="number" min="1">
+          </label>
+        </div>
+        <label>Opis
+          <textarea id="doctorBio" rows="3"></textarea>
+        </label>
+      </div>
+
+      <button type="submit">Zarejestruj</button>
+    </form>
+
+    <details id="resendBox" class="resend-box hidden">
+      <summary>Nie dostałeś linku weryfikacyjnego po rejestracji?</summary>
+      <form id="resendForm" class="form resend-form">
+        <label>E-mail użyty przy rejestracji
+          <input id="resendEmail" type="email" autocomplete="email">
+        </label>
+        <button class="secondary" type="submit">Wyślij link ponownie</button>
+      </form>
+    </details>
+
+    <p id="authMessage" class="message"></p>
+  </section>
+
+  <section class="card">
+    <h2>Nowa rezerwacja</h2>
+    <p id="hoursInfo" class="muted">Godziny przyjęć zostaną załadowane z backendu.</p>
+
+    <div class="form">
+      <label>Lekarz
+        <select id="doctorSelect"></select>
+      </label>
+      <div id="doctorInfo" class="doctor-info muted"></div>
+      <label>Usługa
+        <select id="serviceSelect"></select>
+      </label>
+      <label>Data wizyty
+        <input id="bookingDate" type="date">
+      </label>
+    </div>
+
+    <h3>Dostępne godziny</h3>
+    <div id="slots" class="slots">Wybierz lekarza i datę.</div>
+
+    <form id="bookingForm" class="form">
+      <input type="hidden" id="startsAt">
+      <label>Imię i nazwisko pacjenta
+        <input id="patientName" required minlength="2" autocomplete="name">
+      </label>
+      <label>E-mail pacjenta
+        <input id="patientEmail" type="email" required autocomplete="email">
+      </label>
+      <label>Telefon
+        <input id="patientPhone" autocomplete="tel">
+      </label>
+      <label>Notatka
+        <textarea id="notes" rows="3"></textarea>
+      </label>
+      <button type="submit">Zarezerwuj</button>
+    </form>
+    <p id="bookingMessage" class="message"></p>
+  </section>
+
+  <section class="card admin">
+    <div class="section-header">
+      <h2>Zarządzanie wizytami</h2>
+      <button id="refreshAppointments" type="button">Odśwież</button>
+    </div>
+    <p class="muted">Pacjent widzi swoje wizyty, lekarz swoje, firma wizyty przypisanych lekarzy.</p>
+    <label>Filtruj po dacie
+      <input id="adminDate" type="date">
+    </label>
+    <div id="appointments" class="appointments">Zaloguj się, aby zobaczyć wizyty.</div>
+  </section>
+</main>
+
+<script src="/config.js?v=8"></script>
+<script src="/app.js?v=8"></script>
+</body>
+</html>
